@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -26,4 +27,13 @@ func TablePrintOutputInfo(info OutputInfo) {
 		table.Append([]string{"", domain})
 	}
 	table.Render()
+}
+
+func WriteToFile(info OutputInfo, output string) {
+	json, err := json.Marshal(info)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	}
+	os.WriteFile(output, json, 0644)
 }

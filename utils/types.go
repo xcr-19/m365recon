@@ -141,3 +141,8 @@ type OutputInfo struct {
 	KerberosEndpoint    string
 	TokenEndpoint       string
 }
+
+type Config struct {
+	Verbose bool
+	Output  string
+}
