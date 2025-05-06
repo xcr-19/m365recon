@@ -18,11 +18,21 @@ The `-d` or `--domain` flag is required
 Microsoft Recon Tool by xcr-19
 
 Usage:
-  m365recon [flags]
+  m365recon [command]
+
+Examples:
+m365recon recon ... [commands]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
+  recon       Recon module
 
 Flags:
-  -d, --domain string   Domain name
-  -h, --help            help for m365recon
+  -h, --help      help for m365recon
+  -v, --version   version for m365recon
+
+Use "m365recon [command] --help" for more information about a command.
 ```
 
 ## To-Do
