@@ -17,14 +17,22 @@ const banner = `
                                        
 `
 
+var (
+	version = "dev"
+)
+
 var rootCmd = &cobra.Command{
-	Use:   "m365recon",
-	Short: banner + "\n" + "Microsoft Recon Tool by xcr-19",
-	Long:  banner + "\n" + "Microsoft Recon Tool by xcr-19",
+	Use:     "m365recon [recon] | [enum] | [brute]",
+	Short:   banner + "\n" + "Microsoft Recon Tool by xcr-19",
+	Long:    banner + "\n" + "Microsoft Recon Tool by xcr-19",
+	Version: version,
+	Example: "m365recon recon ... [commands]",
 }
 
 var reconCmd = &cobra.Command{
-	Use:   "recon",
+	Use: "recon [-d domain] [-o output] [-v verbose]",
+	Example: `m365recon recon -d google.com -o output.json
+m365recon recon -d google.com`,
 	Short: "Recon module",
 	Long:  banner + "\n" + "Recon module for Microsoft 365",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -55,6 +63,6 @@ func init() {
 	rootCmd.AddCommand(reconCmd)
 	reconCmd.Flags().StringP("domain", "d", "", "Domain name")
 	reconCmd.MarkFlagRequired("domain")
-	reconCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output")
+	reconCmd.Flags().BoolP("verbose", "v", false, "Verbose output")
 	reconCmd.Flags().StringP("output", "o", "", "Output file")
 }
