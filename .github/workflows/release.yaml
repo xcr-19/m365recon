@@ -26,7 +26,7 @@ jobs:
           GOOS=windows GOARCH=amd64 go build -o dist/m365recon-windows-amd64.exe
       
       - name: Create Github Release
-        uses: actions/actions-gh-release@v2
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
