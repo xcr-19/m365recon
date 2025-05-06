@@ -27,6 +27,12 @@ func ReconByDomain(domain string, config utils.Config) error {
 
 	oidInfo, err := GetOIDInfo(domain)
 	if err != nil {
+		if config.Output != "" {
+			utils.WriteToFile(utils.OutputInfo{
+				Domain: domain,
+				Error:  err.Error(),
+			}, config.Output)
+		}
 		return err
 	}
 	userRelmInfo, err := GetUserRelmInfo(domain)
@@ -59,6 +65,7 @@ func ReconByDomain(domain string, config utils.Config) error {
 	outputInfo.IsDssoEnabled = extendedUserRelmInfo.SuccessExtendedUserRelmInfo.IsDssoEnabled
 	outputInfo.ForceLoginHint = extendedUserRelmInfo.SuccessExtendedUserRelmInfo.ForceLoginHint
 	outputInfo.AdditionalDomains = additionalDomains.Body.GetFederationInformationResponseMessage.Response.Domains.Domain
+	outputInfo.Error = "None"
 
 	utils.TablePrintOutputInfo(outputInfo)
 

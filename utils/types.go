@@ -140,6 +140,7 @@ type OutputInfo struct {
 	UserinfoEndpoint    string
 	KerberosEndpoint    string
 	TokenEndpoint       string
+	Error               string
 }
 
 type Config struct {
