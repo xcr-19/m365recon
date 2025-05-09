@@ -144,6 +144,8 @@ type OutputInfo struct {
 }
 
 type Config struct {
+	Domain  string
 	Verbose bool
 	Output  string
+	Proxy   string
 }

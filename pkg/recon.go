@@ -17,6 +17,7 @@ var verbose bool = false
 func ReconByDomain(domain string, config utils.Config) error {
 	verbose = config.Verbose
 	output := config.Output
+	proxy := config.Proxy
 
 	outputInfo := utils.OutputInfo{
 		Domain: domain,
@@ -25,7 +26,7 @@ func ReconByDomain(domain string, config utils.Config) error {
 		fmt.Println("Starting recon for domain: ", domain)
 	}
 
-	oidInfo, err := GetOIDInfo(domain)
+	oidInfo, err := GetOIDInfo(domain, proxy)
 	if err != nil {
 		if config.Output != "" {
 			utils.WriteToFile(utils.OutputInfo{
@@ -35,17 +36,17 @@ func ReconByDomain(domain string, config utils.Config) error {
 		}
 		return err
 	}
-	userRelmInfo, err := GetUserRelmInfo(domain)
+	userRelmInfo, err := GetUserRelmInfo(domain, proxy)
 	if err != nil {
 		return err
 	}
 
-	extendedUserRelmInfo, err := GetExtendedUserRelmInfo(domain)
+	extendedUserRelmInfo, err := GetExtendedUserRelmInfo(domain, proxy)
 	if err != nil {
 		return err
 	}
 
-	additionalDomains, err := GetAdditionalDomains(domain)
+	additionalDomains, err := GetAdditionalDomains(domain, proxy)
 	if err != nil {
 		return err
 	}
@@ -77,12 +78,12 @@ func ReconByDomain(domain string, config utils.Config) error {
 	return nil
 }
 
-func GetUserRelmInfo(domain string) (utils.UserRelmInfo, error) {
+func GetUserRelmInfo(domain string, proxy string) (utils.UserRelmInfo, error) {
 	if verbose {
 		fmt.Println("Getting user realm info")
 	}
 	userRelmInfo := utils.UserRelmInfo{}
-	client := SetupHTTPClient()
+	client := SetupHTTPClient(proxy)
 	request, err := GetRequest(fmt.Sprintf(utils.AzureUserRelm, domain), "GET")
 	if verbose {
 		fmt.Println("--------------------------------")
@@ -131,12 +132,12 @@ func GetUserRelmInfo(domain string) (utils.UserRelmInfo, error) {
 	return userRelmInfo, nil
 }
 
-func GetExtendedUserRelmInfo(domain string) (utils.ExtendedUserRelmInfo, error) {
+func GetExtendedUserRelmInfo(domain string, proxy string) (utils.ExtendedUserRelmInfo, error) {
 	if verbose {
 		fmt.Println("Getting extended user realm info")
 	}
 	extendedUserRelmInfo := utils.ExtendedUserRelmInfo{}
-	client := SetupHTTPClient()
+	client := SetupHTTPClient(proxy)
 	request, err := GetRequest(fmt.Sprintf(utils.AzureExtendedUserRelm, domain), "GET")
 	if verbose {
 		fmt.Println("--------------------------------")
@@ -182,12 +183,12 @@ func GetExtendedUserRelmInfo(domain string) (utils.ExtendedUserRelmInfo, error) 
 	return extendedUserRelmInfo, nil
 }
 
-func GetOIDInfo(domain string) (utils.OIDInfo, error) {
+func GetOIDInfo(domain string, proxy string) (utils.OIDInfo, error) {
 	if verbose {
 		fmt.Println("Getting OID info")
 	}
 	oidInfo := utils.OIDInfo{}
-	client := SetupHTTPClient()
+	client := SetupHTTPClient(proxy)
 	request, err := GetRequest(fmt.Sprintf(utils.AzureOidInfo, domain), "GET")
 	if verbose {
 		fmt.Println("--------------------------------")
@@ -233,12 +234,12 @@ func GetOIDInfo(domain string) (utils.OIDInfo, error) {
 	return oidInfo, nil
 }
 
-func GetAdditionalDomains(domain string) (utils.FederationInfoResponse, error) {
+func GetAdditionalDomains(domain string, proxy string) (utils.FederationInfoResponse, error) {
 	if verbose {
 		fmt.Println("Getting additional domains via autodiscover")
 	}
 	soapBody := fmt.Sprintf(utils.AzureFederationInfoRequest, domain)
-	client := SetupHTTPClient()
+	client := SetupHTTPClient(proxy)
 	request, err := GetRequest(utils.AzureDomainEmum, "POST")
 	request.Body = io.NopCloser(strings.NewReader(soapBody))
 	request.Header.Set("Content-Type", "text/xml; charset=utf-8")
@@ -271,7 +272,7 @@ func GetAdditionalDomains(domain string) (utils.FederationInfoResponse, error) {
 	if response.Header.Get("X-Proxyerrormessage") == "The network is busy." {
 		fmt.Println("Microsoft network is busy got from proxymessage, retrying...")
 		time.Sleep(1 * time.Second)
-		return GetAdditionalDomains(domain)
+		return GetAdditionalDomains(domain, proxy)
 	}
 	body, err := io.ReadAll(response.Body)
 	if verbose {
